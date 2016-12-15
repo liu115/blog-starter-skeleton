@@ -17,25 +17,118 @@ class SingleArticlePage extends Component {
 
   componentDidMount() {
     // fetch with id
+    fetch(`/api/articles/${this.props.id}`)
+    .then(res => res.json())
+    .then(json => {
+      this.setState({
+        title: json.title,
+        content: json.content,
+        tags: json.tags
+      });
+    });
   }
 
   componentDidUpdate() {
     // fetch with id
+    if (!this.state.isEditing) {
+      fetch(`/api/articles/${this.props.id}`)
+      .then(res => res.json())
+      .then(json => {
+        this.setState({
+          title: json.title,
+          content: json.content,
+          tags: json.tags
+        });
+      });
+    }
   }
 
-  handleTagsChange = () => {};
+  handleTagsChange = () => {
+  };
 
-  handleTitleChange = () => {};
+  handleTitleChange = (e) => {
+    this.setState({ title: e.target.value });
+  };
 
-  handleDelClick = () => {};
+  handleContentChange = (e) => {
+    this.setState({ content: e.target.value });
+  };
+  handleDelClick = () => {
+    const confirm = window.confirm('確定要刪除文章嗎？');
+    if (confirm) {
+      window.location = `/#/articles`;
+      fetch(`/api/articles/${this.props.id}`, { method: 'DELETE' });
 
-  handleEditClick = () => {};
+    }
 
-  renderTitle = () => {};
+  };
 
-  renderTags = () => {};
+  handleEditClick = () => {
+    if (this.state.isEditing) {
+      fetch(`/api/articles/${this.props.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: this.state.title,
+          content: this.state.content,
+          tags: this.state.tags
+        })
+      });
 
-  renderContent = () => {};
+    }
+    const a = !this.state.isEditing;
+    this.setState({ isEditing: a });
+  };
+
+  renderTitle = () => {
+    return (
+    <div className="form-group">
+      <label htmlFor="inputTitle" className="col-sm-2 control-label">Title</label>
+      <div className="col-sm-8">
+        <input
+          type="text"
+          className="form-control"
+          id="inputTitle"
+          onChange={this.handleTitleChange.bind(this)}
+          value={this.state.title}
+          readOnly={!this.state.isEditing}
+        />
+      </div>
+    </div>
+    );
+  };
+
+  renderTags = () => {
+    return (
+    <div className="form-group">
+      <label htmlFor="inputTag" className="col-sm-2 control-label">Tags</label>
+      <div className="col-sm-8">
+        <input type="text" className="form-control" id="inputTag" value={this.state.tags.join()} readOnly={!this.state.isEditing} />
+      </div>
+    </div>
+    );
+  };
+
+  renderContent = () => {
+    return (
+    <div className="form-group">
+      <label htmlFor="inputContent" className="col-sm-2 control-label">Title</label>
+      <div className="col-sm-8">
+        <textarea
+          type="text"
+          className="form-control"
+          id="inputT"
+          onChange={this.handleContentChange.bind(this)}
+          value={this.state.content}
+          readOnly={!this.state.isEditing}
+          rows="5"
+        />
+      </div>
+    </div>
+    );
+  };
 
   render() {
     const { isEditing } = this.state;
